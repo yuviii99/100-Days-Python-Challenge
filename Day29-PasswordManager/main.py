@@ -2,6 +2,7 @@ import tkinter
 from tkinter import messagebox
 import random
 import pyperclip
+import json
 
 
 # ---------------------------- PASSWORD GENERATOR ------------------------------- #
@@ -32,21 +33,48 @@ def add_password():
     website = website_entry.get()
     email = email_entry.get()
     password = pwd_entry.get()
+    new_data = {website: {
+        "email": email,
+        "password": password
+    }}
 
     if len(website) == 0 or len(password) == 0:
         messagebox.showinfo(title="Oops", message="Please don't leave any field empty!")
-        return
+    else:
+        try:
+            with open("data.json", "r") as data_file:
+                data = json.load(data_file)
+        except FileNotFoundError:
+            with open("data.json", "w") as data_file:
+                json.dump(new_data, data_file, indent=4)
+        else:
+            data.update(new_data)
+            with open("data.json", "w") as data_file:
+                json.dump(data, data_file, indent=4)
+        finally:
+            website_entry.delete(0, 'end')
+            pwd_entry.delete(0, 'end')
+            website_entry.focus()
+            messagebox.showinfo(title="Success", message="Your message has been saved!")
 
-    is_ok = messagebox.askyesno(title=website, message=f"These are the details entered by you: \nWebsite: {website}\n"
-                                                       f"Email: {email}\nPassword: {password}")
-    if is_ok:
-        f = open("data.txt", "a")
-        f.write(f"{website} | {email} | {password}\n")
-        f.close()
-        website_entry.delete(0, 'end')
-        pwd_entry.delete(0, 'end')
-        website_entry.focus()
-        messagebox.showinfo(title="Success", message="Your message has been saved!")
+
+# ---------------------------- SEARCH ------------------------------- #
+def search():
+    website = website_entry.get()
+    try:
+        with open("data.json", "r") as data_file:
+            data = json.load(data_file)
+    except FileNotFoundError:
+        messagebox.showinfo(title="File Not Found", message="No Data File Found")
+    else:
+        try:
+            result = data[website]
+        except KeyError:
+            messagebox.showinfo(title="Error", message="No details for the website exists!")
+        else:
+            email = result["email"]
+            password = result["password"]
+            messagebox.showinfo(title=website, message=f"Email: {email}\nPassword: {password}")
 
 
 # ---------------------------- UI SETUP ------------------------------- #
@@ -62,9 +90,12 @@ canvas.grid(row=0, column=1)
 website_label = tkinter.Label(text="Website:", font=("Arial", 12, "normal"))
 website_label.grid(row=1, column=0)
 
-website_entry = tkinter.Entry(width=36)
-website_entry.grid(row=1, column=1, columnspan=2)
+website_entry = tkinter.Entry(width=21)
+website_entry.grid(row=1, column=1)
 website_entry.focus()
+
+search_button = tkinter.Button(text="Search", width=15, command=search)
+search_button.grid(row=1, column=2)
 
 email_label = tkinter.Label(text="Email/Username:")
 email_label.grid(row=2, column=0)
