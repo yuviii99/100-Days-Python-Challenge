@@ -46,3 +46,28 @@ h1{
     width: 60%;
     transform: rotate(25deg);
 }
+#features{
+    padding: 7% 15%;
+}
+.feature-box{
+    text-align: center;
+    padding: 5%;
+}
+.feature{
+    font-family: 'Monsterrat';
+    font-weight: 700;
+    font-size: 1.5rem;
+}
+
+.feature-text{
+    color: #8f8f8f;
+}
+
+.icon{
+    color: #ef8172;
+    margin-bottom: 1rem;
+}
+
+.icon:hover{
+    color: #ff4c68;
+}
